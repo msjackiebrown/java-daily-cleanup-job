@@ -1,19 +1,25 @@
 # Daily Cleanup Job
 
-This project demonstrates how to use **Amazon EventBridge (formerly CloudWatch Events)** to invoke an AWS Lambda function for performing a scheduled cleanup task, such as deleting old files from an S3 bucket.
+This project demonstrates how to use **Amazon EventBridge (formerly CloudWatch Events)** to invoke an AWS Lambda function to delete old files from an S3 bucket.
+
+---
 
 ## Project Overview
 
-- **Use Case**: Automatically delete files older than a specified number of minutes from an S3 bucket every day at midnight.
+- **Use Case**: Automatically delete files older than a specified number of days from an S3 bucket every day at midnight.
 - **Lambda Function**: Scans the S3 bucket, identifies old files, and deletes them.
 - **Trigger**: An EventBridge rule triggers the Lambda function daily at midnight (UTC).
 
+---
+
 ## Features
 
-- **Configurable Cleanup**: The number of days for determining old files can be set via an environment variable (`DAYS`).
+- **Configurable Cleanup**: Set the number of days for determining old files via an environment variable (`DAYS`).
 - **S3 Integration**: Uses the AWS SDK to interact with S3 for listing and deleting objects.
 - **EventBridge Scheduling**: Automatically triggers the cleanup function at a specified time.
 - **IAM Role**: Includes a least-privilege IAM role for accessing the S3 bucket.
+
+---
 
 ## Project Structure
 
@@ -45,6 +51,8 @@ java-daily-cleanup-job/
     └── launch.json
 ```
 
+---
+
 ## Architecture
 
 The architecture of this project is as follows:
@@ -61,6 +69,8 @@ The architecture of this project is as follows:
 3. It lists objects in the specified S3 bucket and deletes files older than the specified number of days.
 4. Logs are written to CloudWatch for monitoring and debugging.
 
+---
+
 ## Prerequisites
 
 Before deploying this project, ensure you have the following:
@@ -70,6 +80,8 @@ Before deploying this project, ensure you have the following:
 3. **Java Development Kit (JDK)**: Version 21 or higher.
 4. **Maven**: For building the Java project.
 5. **S3 Bucket**: An existing S3 bucket where the cleanup will be performed.
+
+---
 
 ## Deployment Instructions
 
@@ -105,6 +117,8 @@ After deployment, verify that:
 - The EventBridge rule is set to trigger the function daily at midnight.
 - The IAM role has the necessary permissions to access the S3 bucket.
 
+---
+
 ## Configuration
 
 ### Environment Variables
@@ -118,6 +132,8 @@ The EventBridge rule is configured to trigger the Lambda function daily at midni
 cron(0 0 * * ? *)
 ```
 
+---
+
 ## Testing
 
 You can test the Lambda function locally using the AWS SAM CLI without providing an event:
@@ -127,12 +143,16 @@ sam local invoke DailyCleanUpFunction
 
 The function will execute using the environment variables and logic defined in the code.
 
+---
+
 ## Cleanup
 
 To delete the deployed resources, run:
 ```bash
 sam delete
 ```
+
+---
 
 ## License
 
