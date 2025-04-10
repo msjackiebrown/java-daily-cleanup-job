@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  java-daily-cleanup-job
+
+  SAM Template for java-daily-cleanup-job
+
+Resources:
+  DailyCleanUpFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: DailyCleanupFunction
+      Handler: msjackiebrown.DailyCleanupHandler::handleRequest
+      Runtime: java21
+      Architectures:
+        - x86_64
+      MemorySize: 512
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          BUCKET_NAME: daily-cleanup-bucket
+          DAYS: "30"
+      Events:
+        ScheduledEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 0 * * ? *) # Runs every day at midnight UTC
+            Name: DailyCleanupAtMidnight
+            Description: "Triggers the daily cleanup Lambda function every day at midnight"
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: S3AccessPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:DeleteObject
+                  - s3:ListBucket
+                  - s3:GetObject
+                Resource:
+                  - arn:aws:s3:::daily-cleanup-bucket
+                  - arn:aws:s3:::daily-cleanup-bucket/*
+        - PolicyName: CloudWatchLogsPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "arn:aws:logs:*:*:*"
+

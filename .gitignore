@@ -1,0 +1,39 @@
+# Maven target directory
+DailyCleanupFunction/target/
+
+# AWS SAM build artifacts
+.aws-sam/
+
+# VS Code settings
+.vscode/
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Java-specific files
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE-specific files
+*.iml
+.idea/
+*.swp
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# Environment files
+.env
+.env.*
+
+# SAM CLI configuration
+samconfig.toml
