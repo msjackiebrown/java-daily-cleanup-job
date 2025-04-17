@@ -5,7 +5,17 @@ Description: >
 
   SAM Template for java-daily-cleanup-job
 
+Globals:
+  Function:
+    Environment:
+      Variables:
+        BUCKET_NAME: daily-cleanup-bucket
+        DAYS: "30"
+        SNS_TOPIC_ARN: !Ref DailyCleanupSNSTopic
+
 Resources:
+  DailyCleanupSNSTopic:
+    Type: AWS::SNS::Topic
   DailyCleanUpFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -15,11 +25,7 @@ Resources:
       Architectures:
         - x86_64
       MemorySize: 512
-      Role: !GetAtt LambdaExecutionRole.Arn
-      Environment:
-        Variables:
-          BUCKET_NAME: daily-cleanup-bucket
-          DAYS: "30"
+      Role: !GetAtt DailyCleanupFunctionRole.Arn
       Events:
         ScheduledEvent:
           Type: Schedule
@@ -27,8 +33,7 @@ Resources:
             Schedule: cron(0 0 * * ? *) # Runs every day at midnight UTC
             Name: DailyCleanupAtMidnight
             Description: "Triggers the daily cleanup Lambda function every day at midnight"
-
-  LambdaExecutionRole:
+  DailyCleanupFunctionRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -51,7 +56,7 @@ Resources:
                 Resource:
                   - arn:aws:s3:::daily-cleanup-bucket
                   - arn:aws:s3:::daily-cleanup-bucket/*
-        - PolicyName: CloudWatchLogsPolicy
+        - PolicyName: LambdaBasicExecutionPolicy
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -60,5 +65,13 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-                Resource: "arn:aws:logs:*:*:*"
+                Resource: "*"
+        - PolicyName: SNSAccessPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource: "*"
 
